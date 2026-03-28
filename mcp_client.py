@@ -2,6 +2,7 @@ import sys
 import asyncio
 from typing import Optional, Any
 from contextlib import AsyncExitStack
+from unittest import result
 from mcp import ClientSession, StdioServerParameters, types
 from mcp.client.stdio import stdio_client
 
@@ -43,13 +44,15 @@ class MCPClient:
 
     async def list_tools(self) -> list[types.Tool]:
         # TODO: Return a list of tools defined by the MCP server
-        return []
+        result = await self.session().list_tools()
+        return result.tools
 
     async def call_tool(
         self, tool_name: str, tool_input: dict
     ) -> types.CallToolResult | None:
+            return await self.session().call_tool(tool_name, tool_input)
         # TODO: Call a particular tool and return the result
-        return None
+        #return None
 
     async def list_prompts(self) -> list[types.Prompt]:
         # TODO: Return a list of prompts defined by the MCP server
