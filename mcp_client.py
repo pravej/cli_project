@@ -1,3 +1,5 @@
+import json
+from pydantic import AnyUrl
 import sys
 import asyncio
 from typing import Optional, Any
@@ -51,7 +53,6 @@ class MCPClient:
         self, tool_name: str, tool_input: dict
     ) -> types.CallToolResult | None:
             return await self.session().call_tool(tool_name, tool_input)
-        # TODO: Call a particular tool and return the result
         #return None
 
     async def list_prompts(self) -> list[types.Prompt]:
@@ -63,8 +64,14 @@ class MCPClient:
         return []
 
     async def read_resource(self, uri: str) -> Any:
-        # TODO: Read a resource, parse the contents and return it
-        return []
+        result = await self.session().read_resource(AnyUrl(uri))
+        resource = result.contents[0]
+    
+        if isinstance(resource, types.TextResourceContents):
+            if resource.mimeType == "application/json":
+                return json.loads(resource.text)
+    
+        return resource.text
 
     async def cleanup(self):
         await self._exit_stack.aclose()
